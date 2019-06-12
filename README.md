@@ -1,7 +1,7 @@
 # flutter_pgyer
 [![pub package](https://img.shields.io/pub/v/flutter_pgyer.svg)](https://pub.dartlang.org/packages/flutter_pgyer)
 
-##蒲公英内测分发：数据统计、原生异常上报、flutter异常上报、应用更新、用户反馈
+## 蒲公英内测分发：数据统计、原生异常上报、flutter异常上报、应用更新、用户反馈
 
 ---
 
