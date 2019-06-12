@@ -1,7 +1,7 @@
 # flutter_pgyer
 [![pub package](https://img.shields.io/pub/v/flutter_pgyer.svg)](https://pub.dartlang.org/packages/flutter_pgyer)
 
-## 支持Android/iOS 内测分发，数据统计、原生异常上报、flutter异常上报、应用更新、用户反馈
+##蒲公英内测分发：数据统计、原生异常上报、flutter异常上报、应用更新、用户反馈
 
 ---
 
@@ -42,4 +42,3 @@ FlutterPgyer.getAppBean().then((appBean){
 3、已知问题
 ----
 1）因为flutter为surfaceview，摇一摇反馈截屏图片会是黑的，官方没有提供让用户自定义生成截屏图片的方法，暂时无解
-
