@@ -41,4 +41,4 @@ FlutterPgyer.getAppBean().then((appBean){
 ```
 3、已知问题
 ----
-1）因为flutter为surfaceview，摇一摇反馈截屏图片会是黑的，官方没有提供让用户自定义生成截屏图片的方法，暂时无解
+1）android因为flutter为surfaceview，摇一摇反馈截屏图片会是黑的，官方没有提供让用户自定义生成截屏图片的方法，暂时无解
