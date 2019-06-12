@@ -15,7 +15,7 @@ dependencies:
 2、使用
 ----
 ```dart
-import 'package:flutter_bugly/flutter_bugly.dart';
+import 'package:flutter_pgyer/flutter_pgyer.dart';
 
 //使用flutter异常上报
 void main() => FlutterPgyer.reportException(()=>runApp(MyApp()));
