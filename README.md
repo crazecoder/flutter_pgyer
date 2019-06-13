@@ -42,6 +42,7 @@ FlutterPgyer.getAppBean().then((appBean){
 3、已知问题
 ----
 1）android因为flutter为surfaceview，摇一摇反馈截屏图片会是黑的，官方没有提供让用户自定义生成截屏图片的方法，暂时无解
+
 2）iOS异常上报debug不可用，打包ipa没有测试，如有问题请issue
 
 4、控制台预览
