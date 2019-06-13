@@ -49,12 +49,12 @@ FlutterPgyer.getAppBean().then((appBean){
 ----
 #### 统计
 ![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/1.png)
+![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/5.png)
 #### android异常上报
 ![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/2.png)
 ![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/3.png)
-![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/4.png)
 #### android反馈
-![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/5.png)
+![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/4.png)
 #### iOS反馈
 ![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/6.png)
 
