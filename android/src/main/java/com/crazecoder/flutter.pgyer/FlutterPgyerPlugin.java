@@ -211,10 +211,10 @@ public class FlutterPgyerPlugin implements MethodCallHandler {
                         }
 
                         @Override
-                        public void downloadSuccessful(Uri uri) {
+                        public void downloadSuccessful(File file) {
                             LogUtil.e("pgyer", "download apk failed");
                             // 使用蒲公英提供的安装方法提示用户 安装apk
-                            PgyUpdateManager.installApk(uri);
+                            PgyUpdateManager.installApk(file);
                         }
 
                         @Override
