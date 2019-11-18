@@ -1,3 +1,5 @@
+## 1.0.1
+* Android SDK升级到最新版本V3.0.10
 ## 1.0.0
 * 实现异常上报（iOS/Android）
 * 实现内测分发应用更新（iOS/Android）
