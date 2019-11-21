@@ -47,17 +47,21 @@
      double shakingThreshold = [call.arguments[@"shakingThreshold"] doubleValue];
      [[PgyManager sharedPgyManager] setEnableFeedback:enable];
      if(enable){
-          NSString *colorHex = call.arguments[@"colorHex"];
-          UIColor *color = [self hexStringToColor:colorHex];
-          [[PgyManager sharedPgyManager] setThemeColor:color];
-          if(isThreeFingersPan){
-              // 设置用户反馈界面激活方式为三指拖动
-              [[PgyManager sharedPgyManager] setFeedbackActiveType:kPGYFeedbackActiveTypeThreeFingersPan];
-          }else{
-              // 设置用户反馈界面激活方式为摇一摇
-              [[PgyManager sharedPgyManager] setFeedbackActiveType:kPGYFeedbackActiveTypeShake];
-              [[PgyManager sharedPgyManager] setShakingThreshold:shakingThreshold];
-          }
+            NSString *colorHex = call.arguments[@"colorHex"];
+            BOOL b = [self isBlankString:colorHex];
+            if(!b){
+                UIColor *color = [self hexStringToColor:colorHex];
+                [[PgyManager sharedPgyManager] setThemeColor:color];
+            }
+
+            if(isThreeFingersPan){
+                // 设置用户反馈界面激活方式为三指拖动
+                [[PgyManager sharedPgyManager] setFeedbackActiveType:kPGYFeedbackActiveTypeThreeFingersPan];
+            }else{
+                // 设置用户反馈界面激活方式为摇一摇
+                [[PgyManager sharedPgyManager] setFeedbackActiveType:kPGYFeedbackActiveTypeShake];
+                [[PgyManager sharedPgyManager] setShakingThreshold:shakingThreshold];
+            }
      }
      result(nil);
   } else if ([@"showFeedbackView" isEqualToString:call.method]) {

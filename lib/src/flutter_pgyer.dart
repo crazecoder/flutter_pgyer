@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -92,7 +93,15 @@ class FlutterPgyer {
   }) {
     bool useLog = false;
     assert(useLog = true);
-    var map = {};
+    FlutterError.onError = (FlutterErrorDetails details) async {
+      Zone.current.handleUncaughtError(details.exception, details.stack);
+    };
+    Isolate.current.addErrorListener(RawReceivePort((dynamic pair) async {
+      var isolateError = pair as List<dynamic>;
+      var _error = isolateError.first;
+      var _stackTrace = isolateError.last;
+      Zone.current.handleUncaughtError(_error, _stackTrace);
+    }).sendPort);
     runZoned<Future<Null>>(() async {
       callback();
     }, onError: (error, stackTrace) async {
@@ -113,9 +122,15 @@ class FlutterPgyer {
           return;
         }
       }
-      map.putIfAbsent("crash_message", () => errorStr);
-      map.putIfAbsent("crash_detail", () => stackTrace.toString());
-      await _channel.invokeMethod('reportException', map);
+      uploadException(message: errorStr,detail: stackTrace.toString());
     });
+  }
+
+  static Future<Null> uploadException({String message, String detail}) async {
+    assert(message != null && detail != null);
+    var map = {};
+    map.putIfAbsent("crash_message", () => message);
+    map.putIfAbsent("crash_detail", () => detail);
+    await _channel.invokeMethod('reportException', map);
   }
 }
