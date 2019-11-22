@@ -45,6 +45,10 @@ FlutterPgyer.getAppBean().then((appBean){
 
 2）iOS异常上报debug不可用，打包ipa没有测试，如有问题请issue
 
+3) 【新】android 10上摇一摇反馈crash，请不要开启，建议直接调用showFeedbackView来显示反馈界面
+
+4) 【新】运营统计及crash不会上报，但是调试SDK打印Transmission succeeded，提工单也没人理，感觉要凉了
+
 4、控制台预览
 ----
 #### 统计

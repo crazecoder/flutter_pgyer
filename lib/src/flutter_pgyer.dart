@@ -16,7 +16,7 @@ class FlutterPgyer {
 
   static void init({
     FlutterPgyerInitCallBack callBack,
-    String androidAppId, //android目前只支持xml设置
+    String androidAppId,
     String iOSAppId,
   }) {
     assert((Platform.isAndroid && androidAppId != null) ||
