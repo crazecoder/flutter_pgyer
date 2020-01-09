@@ -24,7 +24,7 @@ void main() => FlutterPgyer.reportException(()=>runApp(MyApp()));
 FlutterPgyer.init(
         iOSAppId: "appid",
         androidAppId: "appid",
-      });
+      );
 
 //用户反馈附带参数
 FlutterPgyer.setEnableFeedback(param: map);
