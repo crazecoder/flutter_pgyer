@@ -28,18 +28,27 @@ class FlutterPgyer {
       "appId": iOSAppId,
     };
     var resultBean;
-    runZoned(
+    Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) {
+      var isolateError = pair as List<dynamic>;
+      var _error = isolateError.first;
+      var _stackTrace = isolateError.last;
+      Zone.current.handleUncaughtError(_error, _stackTrace);
+    }).sendPort);
+    runZonedGuarded(
       () async {
         final String result = await _channel.invokeMethod('initSdk', map);
         Map resultMap = json.decode(result);
         resultBean = InitResultInfo.fromJson(resultMap);
         callBack(resultBean);
       },
-      onError: (error) {
+      (error, stackTrace) {
         resultBean = InitResultInfo();
         callBack(resultBean);
       },
     );
+    FlutterError.onError = (details) {
+      Zone.current.handleUncaughtError(details.exception, details.stack);
+    };
   }
 
   ///用户反馈 iOS专用

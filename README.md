@@ -33,21 +33,10 @@ FlutterPgyer.setEnableFeedback(param: map);
 //可选参数
 //bool autoDownload = false, //android专用，自动下载安装，没有交互界面
 FlutterPgyer.checkUpdate();
-
-//获取更新信息
-FlutterPgyer.getAppBean().then((appBean){
-              print(appBean?.downloadURL);
-            });
 ```
 3、已知问题
 ----
-1）android因为flutter为surfaceview，摇一摇反馈截屏图片会是黑的，官方没有提供让用户自定义生成截屏图片的方法，暂时无解
-
-2）iOS异常上报debug不可用，打包ipa没有测试，如有问题请issue
-
-3）【新】android 10上摇一摇反馈crash，请不要开启，建议直接调用showFeedbackView来显示反馈界面
-
-4）【新】运营统计及crash不会上报，但是调试SDK打印Transmission succeeded，提工单也没人理，感觉要凉了
+1）iOS异常上报debug不可用，打包ipa没有测试，如有问题请issue
 
 4、控制台预览
 ----
@@ -57,8 +46,6 @@ FlutterPgyer.getAppBean().then((appBean){
 #### android异常上报
 ![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/2.png)
 ![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/3.png)
-#### android反馈
-![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/4.png)
 #### iOS反馈
 ![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/6.png)
 
