@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.android.tools.build:gradle:4.0.2'
     }
 }
 
@@ -16,14 +16,15 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
-        maven { url "https://raw.githubusercontent.com/Pgyer/mvn_repo_pgyer/master" }
+        maven { url 'https://jitpack.io' }
+        maven { url "https://raw.githubusercontent.com/Pgyer/analytics/master" }
     }
 }
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 22
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 19
@@ -34,7 +35,7 @@ android {
     }
 }
 dependencies {
-    implementation 'com.pgyersdk:sdk:3.0.10'
+    implementation 'com.pgyer:analytics:4.1.16'
     implementation 'androidx.appcompat:appcompat:1.1.0'
 }
 

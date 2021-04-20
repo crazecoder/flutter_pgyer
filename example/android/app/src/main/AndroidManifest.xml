@@ -7,7 +7,6 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-        android:name="io.flutter.app.FlutterApplication"
         android:label="flutter_pgyer_example"
         android:icon="@mipmap/ic_launcher">
         <activity
@@ -29,9 +28,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <!--<meta-data-->
-                <!--android:name="PGYER_APPID"-->
-                <!--android:value="c00c23e3a1c44b154d8853958c9d5c9c" >-->
-        <!--</meta-data>-->
+        <meta-data
+                android:name="flutterEmbedding"
+                android:value="2" />
     </application>
 </manifest>

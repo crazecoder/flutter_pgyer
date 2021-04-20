@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter_pgyer/flutter_pgyer.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-
-void main() => FlutterPgyer.reportException(()=>runApp(MyApp()));
+void main() => FlutterPgyer.reportException(() => runApp(MyApp()));
 
 class MyApp extends StatefulWidget {
   @override
@@ -17,7 +17,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    Permission.phone.request().then((value) => initPlatformState());
   }
 
   // Platform messages are asynchronous, so we initialize in an async method.
@@ -26,13 +26,15 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     FlutterPgyer.init(
         iOSAppId: "09134f7da29170173fb0e842a4a17f7d",
-        androidAppId: "c00c23e3a1c44b154d8853958c9d5c9c",
+        androidApiKey: "0a7a3c64217418800cf254ebd1839187",
+        frontJSToken: "44f5a0de2ec979b186c13723e1c3eb6d",
         callBack: (result) {
           setState(() {
             _platformVersion = result.message;
           });
         });
-    FlutterPgyer.setEnableFeedback(param: {"test":"dddddd","test1":"dddddd1"});
+    FlutterPgyer.setEnableFeedback(
+        param: {"test": "dddddd", "test1": "dddddd1"});
     FlutterPgyer.checkUpdate();
   }
 
@@ -44,12 +46,12 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: Center(
-          child: GestureDetector(child: Text('初始化: $_platformVersion\n'),onTap: (){
-            FlutterPgyer.getAppBean().then((appBean){
-              print(appBean?.downloadURL);
-            });
-
-          },),
+          child: GestureDetector(
+            child: Text('初始化: $_platformVersion\n'),
+            onTap: () {
+              throw FlutterError("message");
+            },
+          ),
         ),
       ),
     );

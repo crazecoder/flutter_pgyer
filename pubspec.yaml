@@ -1,11 +1,12 @@
 name: flutter_pgyer
 description: pgyer.com for flutter
-version: 1.0.1
+version: 2.0.0
 author: crazecoder <21527312@qq.com>
 homepage: https://github.com/crazecoder/flutter_pgyer
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
+  flutter: ">=1.12.0"
 
 dependencies:
   flutter:
@@ -25,8 +26,12 @@ flutter:
   # be modified. They are used by the tooling to maintain consistency when
   # adding or updating assets for this project.
   plugin:
-    androidPackage: com.crazecoder.flutter.pgyer
-    pluginClass: FlutterPgyerPlugin
+    platforms:
+      android:
+        package: com.crazecoder.flutter.pgyer
+        pluginClass: FlutterPgyerPlugin
+      ios:
+        pluginClass: FlutterPgyerPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

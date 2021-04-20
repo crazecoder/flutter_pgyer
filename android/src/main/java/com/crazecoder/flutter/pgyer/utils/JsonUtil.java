@@ -1,7 +1,6 @@
 package com.crazecoder.flutter.pgyer.utils;
 
 import com.crazecoder.flutter.pgyer.BuildConfig;
-import com.pgyersdk.update.javabean.AppBean;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,18 +27,18 @@ public class JsonUtil {
         return jsonObject.toString();
     }
 
-    public static String toJson(AppBean appBean) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("versionName", appBean.getVersionName());
-            jsonObject.put("downloadURL", appBean.getDownloadURL());
-            jsonObject.put("versionCode", appBean.getVersionCode());
-            jsonObject.put("releaseNote", appBean.getReleaseNote());
-            jsonObject.put("shouldForceToUpdate", appBean.isShouldForceToUpdate());
-        } catch (JSONException e) {
-            if (BuildConfig.DEBUG)
-                e.printStackTrace();
-        }
-        return jsonObject.toString();
-    }
+//    public static String toJson(AppBean appBean) {
+//        JSONObject jsonObject = new JSONObject();
+//        try {
+//            jsonObject.put("versionName", appBean.getVersionName());
+//            jsonObject.put("downloadURL", appBean.getDownloadURL());
+//            jsonObject.put("versionCode", appBean.getVersionCode());
+//            jsonObject.put("releaseNote", appBean.getReleaseNote());
+//            jsonObject.put("shouldForceToUpdate", appBean.isShouldForceToUpdate());
+//        } catch (JSONException e) {
+//            if (BuildConfig.DEBUG)
+//                e.printStackTrace();
+//        }
+//        return jsonObject.toString();
+//    }
 }

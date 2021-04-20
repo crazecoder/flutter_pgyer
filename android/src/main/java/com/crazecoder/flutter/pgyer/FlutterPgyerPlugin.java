@@ -2,33 +2,25 @@ package com.crazecoder.flutter.pgyer;
 
 import android.Manifest;
 import android.app.Activity;
-import android.net.Uri;
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
 
 import com.crazecoder.flutter.pgyer.bean.InitResultInfo;
-import com.crazecoder.flutter.pgyer.utils.AppUtil;
 import com.crazecoder.flutter.pgyer.utils.JsonUtil;
-import com.crazecoder.flutter.pgyer.utils.LogUtil;
 import com.crazecoder.flutter.pgyer.utils.MapUtil;
-import com.pgyersdk.Pgyer;
-import com.pgyersdk.c.a;
-import com.pgyersdk.crash.PgyCrashManager;
-import com.pgyersdk.feedback.PgyerFeedbackManager;
-import com.pgyersdk.update.DownloadFileListener;
-import com.pgyersdk.update.PgyUpdateManager;
-import com.pgyersdk.update.UpdateManagerListener;
-import com.pgyersdk.update.javabean.AppBean;
+import com.pgyer.pgyersdk.PgyerSDKManager;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -38,45 +30,44 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 /**
  * FlutterPgyerPlugin
  */
-public class FlutterPgyerPlugin implements MethodCallHandler {
+public class FlutterPgyerPlugin implements FlutterPlugin, MethodCallHandler, ActivityAware {
 
     private Activity activity;
-    private PgyerFeedbackManager pgyerFeedbackManager;
-    private AppBean flutterAppBean;
+    private FlutterPluginBinding flutterPluginBinding;
+    private MethodChannel channel;
 
-    private FlutterPgyerPlugin(Activity activity) {
+    private final PgyerSDKManager.InitSdk sdkManager = new PgyerSDKManager.InitSdk();
+
+    public FlutterPgyerPlugin(Activity activity,MethodChannel channel){
         this.activity = activity;
+        this.channel = channel;
     }
-
     /**
      * Plugin registration.
      */
+    @Deprecated
     public static void registerWith(Registrar registrar) {
         final MethodChannel channel = new MethodChannel(registrar.messenger(), "crazecoder/flutter_pgyer");
-        FlutterPgyerPlugin plugin = new FlutterPgyerPlugin(registrar.activity());
+        FlutterPgyerPlugin plugin = new FlutterPgyerPlugin(registrar.activity(),channel);
         channel.setMethodCallHandler(plugin);
     }
 
     @Override
-    public void onMethodCall(final MethodCall call, Result result) {
+    public void onMethodCall(final MethodCall call, @NonNull Result result) {
         if (call.method.equals("initSdk")) {
             String json;
-            if (call.hasArgument("appId")){
-                String appId = call.argument("appId");
-                if(TextUtils.isEmpty(appId)){
-                    json = JsonUtil.toJson(MapUtil.deepToMap(getResultBean(false, "appId is not correct")));
-                    result.success(json);
-                    return;
-                }
-                Pgyer.setAppId(appId);
-            }
             try {
-                if (!hasPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                    json = JsonUtil.toJson(MapUtil.deepToMap(getResultBean(false, "Permission denied: " + Manifest.permission.WRITE_EXTERNAL_STORAGE)));
+                if (!hasPermission(Manifest.permission.READ_PHONE_STATE)) {
+                    json = JsonUtil.toJson(MapUtil.deepToMap(getResultBean(false, "Permission denied: " + Manifest.permission.READ_PHONE_STATE)));
                     result.success(json);
                     return;
                 }
-                PgyCrashManager.register(); //推荐使用
+                String apiKey = call.argument("apiKey");
+                String frontJSToken = call.argument("frontJSToken");
+                sdkManager.setContext(activity.getApplication())
+                        .setApiKey(apiKey) //添加apikey
+                        .setFrontJSToken(frontJSToken)    //添加 token
+                        .build();
 //                PgyCrashManager.setIsIgnoreDefaultHander(false);
                 json = JsonUtil.toJson(MapUtil.deepToMap(getResultBean(true, "初始化成功")));
             } catch (Exception e) {
@@ -131,115 +122,11 @@ public class FlutterPgyerPlugin implements MethodCallHandler {
                 StackTraceElement[] elementsArray = new StackTraceElement[elements.size()];
                 throwable.setStackTrace(elements.toArray(elementsArray));
             }
-            PgyCrashManager.reportCaughtException(new Exception(throwable));
-            result.success(null);
-        } else if (call.method.equals("setEnableFeedback")) {
-            if (call.hasArgument("enable")) {
-                boolean enable = call.argument("enable");
-                if (enable) {
-                    PgyerFeedbackManager.PgyerFeedbackBuilder builder = new PgyerFeedbackManager.PgyerFeedbackBuilder();
-                    if (call.hasArgument("isDialog")) {
-                        boolean isDialog = call.argument("isDialog");
-                        builder.setDisplayType(isDialog ? PgyerFeedbackManager.TYPE.DIALOG_TYPE : PgyerFeedbackManager.TYPE.ACTIVITY_TYPE);
-                        if (call.hasArgument("isThreeFingersPan")) {
-                            boolean isThreeFingersPan = call.argument("isThreeFingersPan");
-                            builder.setShakeInvoke(!isThreeFingersPan);
-
-                        }
-                        if (call.hasArgument("colorHex")) {
-                            String colorHex = call.argument("colorHex");
-                            if (!TextUtils.isEmpty(colorHex))
-                                builder.setColorDialogTitle(colorHex)    //设置Dialog 标题的字体颜色，默认为颜色为#ffffff
-                                        .setColorTitleBg(colorHex)        //设置Dialog 标题栏的背景色，默认为颜色为#2E2D2D
-                                        .setBarBackgroundColor(colorHex)      // 设置顶部按钮和底部背景色，默认颜色为 #2E2D2D
-                                        .setBarButtonPressedColor(colorHex)        //设置顶部按钮和底部按钮按下时的反馈色 默认颜色为 #383737
-                                        .setColorPickerBackgroundColor(colorHex);   //设置颜色选择器的背景色,默认颜色为 #272828
-                        }
-                        if (call.hasArgument("param")) {
-                            Map<String, String> param = call.argument("param");
-                            for (Map.Entry<String, String> entry : param.entrySet()) {
-                                builder.setMoreParam(entry.getKey(), entry.getValue());
-                            }
-                        }
-                    }
-                    pgyerFeedbackManager = builder.builder();
-                    pgyerFeedbackManager.register();
-                }
-            }
-            result.success(null);
-        } else if (call.method.equals("showFeedbackView")) {
-            if (pgyerFeedbackManager != null) {
-                pgyerFeedbackManager.invoke();
-            }
+            PgyerSDKManager.reportException(new Exception(throwable));
             result.success(null);
         } else if (call.method.equals("checkUpdate")) {
-            new PgyUpdateManager.Builder()
-//                    .setForced(true)                //设置是否强制提示更新,非自定义回调更新接口此方法有用
-//                    .setUserCanRetry(false)         //失败后是否提示重新下载，非自定义下载 apk 回调此方法有用
-//                    .setDeleteHistroyApk(false)     // 检查更新前是否删除本地历史 Apk， 默认为true
-                    .setUpdateManagerListener(new UpdateManagerListener() {
-                        @Override
-                        public void onNoUpdateAvailable() {
-                            //没有更新是回调此方法
-                            LogUtil.d("pgyer", "there is no new version");
-                        }
-
-                        @Override
-                        public void onUpdateAvailable(AppBean appBean) {
-                            //有更新回调此方法
-                            //调用以下方法，DownloadFileListener 才有效；
-                            //如果完全使用自己的下载方法，不需要设置DownloadFileListener
-                            if (call.hasArgument("autoDownload")) {
-                                boolean autoDownload = call.argument("autoDownload");
-                                if (autoDownload)
-                                    PgyUpdateManager.downLoadApk(appBean.getDownloadURL());
-                            }
-                            flutterAppBean = appBean;
-                            if (Integer.parseInt(appBean.getVersionCode()) > AppUtil.getAppVersionCode(activity)) {
-                                AppUtil.saveAppBean(activity, appBean);
-                            }
-                        }
-
-                        @Override
-                        public void checkUpdateFailed(Exception e) {
-                            //更新检测失败回调
-                            //更新拒绝（应用被下架，过期，不在安装有效期，下载次数用尽）以及无网络情况会调用此接口
-                            LogUtil.e("pgyer", "check update failed ", e);
-                        }
-                    })
-//                    //注意 ：
-//                    //下载方法调用 PgyUpdateManager.downLoadApk(appBean.getDownloadURL()); 此回调才有效
-//                    //此方法是方便用户自己实现下载进度和状态的 UI 提供的回调
-//                    //想要使用蒲公英的默认下载进度的UI则不设置此方法
-                    .setDownloadFileListener(new DownloadFileListener() {
-                        @Override
-                        public void downloadFailed() {
-                            //下载失败
-                            LogUtil.e("pgyer", "download apk failed");
-                        }
-
-                        @Override
-                        public void downloadSuccessful(File file) {
-                            LogUtil.e("pgyer", "download apk failed");
-                            // 使用蒲公英提供的安装方法提示用户 安装apk
-                            PgyUpdateManager.installApk(file);
-                        }
-
-                        @Override
-                        public void onProgressUpdate(Integer... integers) {
-                            LogUtil.e("pgyer", "update download apk progress" + integers);
-                        }
-                    })
-                    .register();
+            PgyerSDKManager.checkSoftwareUpdate(activity);
             result.success(null);
-        } else if (call.method.equals("getAppBean")) {
-            String json;
-            if (flutterAppBean == null) {
-                json = AppUtil.getAppBeanJson(activity);
-            } else {
-                json = JsonUtil.toJson(flutterAppBean);
-            }
-            result.success(json);
         } else {
             result.notImplemented();
         }
@@ -256,4 +143,37 @@ public class FlutterPgyerPlugin implements MethodCallHandler {
         return ContextCompat.checkSelfPermission(activity, permission) == PermissionChecker.PERMISSION_GRANTED;
     }
 
+    @Override
+    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
+        this.flutterPluginBinding = binding;
+
+    }
+
+    @Override
+    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+        channel.setMethodCallHandler(null);
+        flutterPluginBinding = null;
+    }
+
+    @Override
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        activity = binding.getActivity();
+        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "crazecoder/flutter_bugly");
+        channel.setMethodCallHandler(this);
+    }
+
+    @Override
+    public void onDetachedFromActivityForConfigChanges() {
+
+    }
+
+    @Override
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+
+    }
+
+    @Override
+    public void onDetachedFromActivity() {
+
+    }
 }

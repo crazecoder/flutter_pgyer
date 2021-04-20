@@ -6,7 +6,6 @@ import 'dart:isolate';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pgyer/src/bean/result.dart';
-import 'package:flutter_pgyer/src/bean/app_bean.dart';
 
 typedef FlutterPgyerInitCallBack = Function(InitResultInfo);
 
@@ -16,13 +15,17 @@ class FlutterPgyer {
 
   static void init({
     FlutterPgyerInitCallBack callBack,
-    String androidAppId,
+    String androidApiKey,
+    String frontJSToken,
     String iOSAppId,
   }) {
-    assert((Platform.isAndroid && androidAppId != null) ||
-        (Platform.isIOS && iOSAppId != null));
+    assert(
+        (Platform.isAndroid && androidApiKey != null && frontJSToken != null) ||
+            (Platform.isIOS && iOSAppId != null));
     Map<String, Object> map = {
-      "appId": Platform.isAndroid ? androidAppId : iOSAppId,
+      "apiKey": androidApiKey,
+      "frontJSToken": frontJSToken,
+      "appId": iOSAppId,
     };
     var resultBean;
     runZoned(
@@ -39,7 +42,7 @@ class FlutterPgyer {
     );
   }
 
-  ///用户反馈
+  ///用户反馈 iOS专用
   static Future<Null> setEnableFeedback({
     bool enable = true,
     String colorHex, //反馈界面主题颜色，16进制颜色字符串，如#FFFFFF
@@ -60,32 +63,18 @@ class FlutterPgyer {
     await _channel.invokeMethod('setEnableFeedback', map);
   }
 
-  ///手动显示用户反馈界面，需在setEnableFeedback后调用
+  ///手动显示用户反馈界面，需在setEnableFeedback后调用 iOS专用
   static Future<Null> showFeedbackView() async {
     await _channel.invokeMethod('showFeedbackView');
   }
 
   ///检查更新
-  static Future<Null> checkUpdate({
-    bool autoDownload = false, //android专用，自动下载安装，没有交互界面
-  }) async {
-    Map<String, Object> map = {
-      "autoDownload": autoDownload,
-    };
-    await _channel.invokeMethod('checkUpdate', map);
-  }
-
-  ///android专用，获取更新信息，在checkUpdate后使用，尽量避免checkUpdate没监听到返回就调用此方法
-  static Future<AppBean> getAppBean() async {
-    final String result = await _channel.invokeMethod('getAppBean');
-    if (result == null || result.isEmpty) return null;
-    Map map = json.decode(result);
-    var appBean = AppBean.fromJson(map);
-    return appBean;
+  static Future<Null> checkUpdate() async {
+    await _channel.invokeMethod('checkUpdate');
   }
 
   ///异常上报，官方设置
-  ///调试模式下ios会因为当前为调试模式，所以异常信息将不会被上报至蒲公英。
+  ///调试模式下iOS会因为当前为调试模式，所以异常信息将不会被上报至蒲公英。
   static void reportException<T>(
     T callback(), {
     FlutterExceptionHandler handler, //异常捕捉，用于自定义打印异常
@@ -122,7 +111,7 @@ class FlutterPgyer {
           return;
         }
       }
-      uploadException(message: errorStr,detail: stackTrace.toString());
+      uploadException(message: errorStr, detail: stackTrace.toString());
     });
   }
 
