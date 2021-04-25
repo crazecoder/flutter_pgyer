@@ -17,15 +17,15 @@ class FlutterPgyer {
     FlutterPgyerInitCallBack callBack,
     String androidApiKey,
     String frontJSToken,
-    String iOSAppId,
+    String iOSAppKey,
   }) {
     assert(
         (Platform.isAndroid && androidApiKey != null && frontJSToken != null) ||
-            (Platform.isIOS && iOSAppId != null));
+            (Platform.isIOS && iOSAppKey != null));
     Map<String, Object> map = {
       "apiKey": androidApiKey,
       "frontJSToken": frontJSToken,
-      "appId": iOSAppId,
+      "appId": iOSAppKey,
     };
     var resultBean;
     Isolate.current.addErrorListener(new RawReceivePort((dynamic pair) {
@@ -61,6 +61,9 @@ class FlutterPgyer {
         false, // ios，设置用户反馈界面激活方式为三指拖动 android，设置true时，不开启摇一摇，需要手动show
     double shakingThreshold = 2.3, //ios专用，自定义摇一摇灵敏度，默认为2.3，数值越小灵敏度越高
   }) async {
+    if (Platform.isAndroid) {
+      return;
+    }
     Map<String, Object> map = {
       "enable": enable,
       "colorHex": colorHex,
@@ -100,9 +103,9 @@ class FlutterPgyer {
       var _stackTrace = isolateError.last;
       Zone.current.handleUncaughtError(_error, _stackTrace);
     }).sendPort);
-    runZoned<Future<Null>>(() async {
+    runZonedGuarded<Future<Null>>(() async {
       callback();
-    }, onError: (error, stackTrace) async {
+    }, (error, stackTrace) async {
       if (useLog || handler != null) {
         FlutterErrorDetails details =
             FlutterErrorDetails(exception: error, stack: stackTrace);

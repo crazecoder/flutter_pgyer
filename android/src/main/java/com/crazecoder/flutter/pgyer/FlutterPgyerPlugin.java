@@ -38,19 +38,19 @@ public class FlutterPgyerPlugin implements FlutterPlugin, MethodCallHandler, Act
 
     private final PgyerSDKManager.InitSdk sdkManager = new PgyerSDKManager.InitSdk();
 
-    public FlutterPgyerPlugin(Activity activity,MethodChannel channel){
-        this.activity = activity;
-        this.channel = channel;
-    }
-    /**
-     * Plugin registration.
-     */
-    @Deprecated
-    public static void registerWith(Registrar registrar) {
-        final MethodChannel channel = new MethodChannel(registrar.messenger(), "crazecoder/flutter_pgyer");
-        FlutterPgyerPlugin plugin = new FlutterPgyerPlugin(registrar.activity(),channel);
-        channel.setMethodCallHandler(plugin);
-    }
+//    public FlutterPgyerPlugin(Activity activity,MethodChannel channel){
+//        this.activity = activity;
+//        this.channel = channel;
+//    }
+//    /**
+//     * Plugin registration.
+//     */
+//    @Deprecated
+//    public static void registerWith(Registrar registrar) {
+//        final MethodChannel channel = new MethodChannel(registrar.messenger(), "crazecoder/flutter_pgyer");
+//        FlutterPgyerPlugin plugin = new FlutterPgyerPlugin(registrar.activity(),channel);
+//        channel.setMethodCallHandler(plugin);
+//    }
 
     @Override
     public void onMethodCall(final MethodCall call, @NonNull Result result) {
@@ -158,7 +158,7 @@ public class FlutterPgyerPlugin implements FlutterPlugin, MethodCallHandler, Act
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
         activity = binding.getActivity();
-        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "crazecoder/flutter_bugly");
+        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "crazecoder/flutter_pgyer");
         channel.setMethodCallHandler(this);
     }
 
