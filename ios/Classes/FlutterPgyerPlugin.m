@@ -42,10 +42,10 @@
      [[PgyManager sharedPgyManager] reportException:ex];
      result(nil);
   } else if ([@"setEnableFeedback" isEqualToString:call.method]) {
-     BOOL enable = call.arguments[@"enable"];
+     BOOL enable = [call.arguments[@"enable"] boolValue];
      BOOL isThreeFingersPan = call.arguments[@"isThreeFingersPan"];
      double shakingThreshold = [call.arguments[@"shakingThreshold"] doubleValue];
-     [[PgyManager sharedPgyManager] setEnableFeedback:enable];
+      [[PgyManager sharedPgyManager] setEnableFeedback:enable];
      if(enable){
             NSString *colorHex = call.arguments[@"colorHex"];
             BOOL b = [self isBlankString:colorHex];
