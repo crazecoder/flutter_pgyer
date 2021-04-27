@@ -25,7 +25,9 @@ class FlutterPgyer {
               ? IOSCheckModel.fromJson(call.arguments)
               : CheckSoftModel.fromJson(call.arguments["model"]),
           checkEnum: Platform.isIOS
-              ? CheckEnum.SUCCESS
+              ? call.arguments == null
+                  ? CheckEnum.NO_VERSION
+                  : CheckEnum.SUCCESS
               : CheckEnum.values[call.arguments["enum"]],
         );
         _onCheckUpgrade.add(_result);
