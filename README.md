@@ -34,6 +34,16 @@ FlutterPgyer.setEnableFeedback(param: map);
 //bool autoDownload = false, //android专用，自动下载安装，没有交互界面
 FlutterPgyer.checkUpdate();
 ```
+###Android 
+在项目manifest里添加（如果对统计没有要求，可不配置，区别在于上传apk到蒲公英时，能不能检测到集成，无法检测到就不会有统计）
+```
+<meta-data
+        android:name="PGYER_API_KEY"
+        android:value="your api key"/>
+<meta-data
+        android:name="PGYER_FRONTJS_KEY"
+        android:value="your frontjs key"/>
+```
 3、已知问题
 ----
 1）iOS异常上报debug不可用，打包ipa没有测试，如有问题请issue
