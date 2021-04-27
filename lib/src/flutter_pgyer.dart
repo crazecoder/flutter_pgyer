@@ -5,6 +5,9 @@ import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_pgyer/src/bean/check_result.dart';
+import 'package:flutter_pgyer/src/bean/check_soft_model.dart';
+import 'package:flutter_pgyer/src/bean/ios_check_model.dart';
 import 'package:flutter_pgyer/src/bean/result.dart';
 
 typedef FlutterPgyerInitCallBack = Function(InitResultInfo);
@@ -12,6 +15,25 @@ typedef FlutterPgyerInitCallBack = Function(InitResultInfo);
 class FlutterPgyer {
   static const MethodChannel _channel =
       const MethodChannel('crazecoder/flutter_pgyer');
+  static final _onCheckUpgrade = StreamController<CheckResult>.broadcast();
+
+  static Future<Null> _handleMessages(MethodCall call) async {
+    switch (call.method) {
+      case 'onCheckUpgrade':
+        CheckResult _result = CheckResult(
+          model: Platform.isIOS
+              ? IOSCheckModel.fromJson(call.arguments)
+              : CheckSoftModel.fromJson(call.arguments["model"]),
+          checkEnum: Platform.isIOS
+              ? CheckEnum.SUCCESS
+              : CheckEnum.values[call.arguments["enum"]],
+        );
+        _onCheckUpgrade.add(_result);
+        break;
+    }
+  }
+
+  static Stream<CheckResult> get onCheckUpgrade => _onCheckUpgrade.stream;
 
   static void init({
     FlutterPgyerInitCallBack callBack,
@@ -22,6 +44,7 @@ class FlutterPgyer {
     assert(
         (Platform.isAndroid && androidApiKey != null && frontJSToken != null) ||
             (Platform.isIOS && iOSAppKey != null));
+    _channel.setMethodCallHandler(_handleMessages);
     Map<String, Object> map = {
       "apiKey": androidApiKey,
       "frontJSToken": frontJSToken,
@@ -81,8 +104,16 @@ class FlutterPgyer {
   }
 
   ///检查更新
-  static Future<Null> checkUpdate() async {
-    await _channel.invokeMethod('checkUpdate');
+  static Future<Null> checkSoftwareUpdate({bool justNotify = true}) async {
+    Map<String, Object> map = {
+      "justNotify": justNotify,
+    };
+    await _channel.invokeMethod('checkSoftwareUpdate', map);
+  }
+
+  ///检查更新
+  static Future<Null> checkVersionUpdate() async {
+    await _channel.invokeMethod('checkVersionUpdate');
   }
 
   ///异常上报，官方设置
@@ -94,9 +125,7 @@ class FlutterPgyer {
   }) {
     bool useLog = false;
     assert(useLog = true);
-    FlutterError.onError = (FlutterErrorDetails details) async {
-      Zone.current.handleUncaughtError(details.exception, details.stack);
-    };
+
     Isolate.current.addErrorListener(RawReceivePort((dynamic pair) async {
       var isolateError = pair as List<dynamic>;
       var _error = isolateError.first;
@@ -125,6 +154,9 @@ class FlutterPgyer {
       }
       uploadException(message: errorStr, detail: stackTrace.toString());
     });
+    FlutterError.onError = (FlutterErrorDetails details) async {
+      Zone.current.handleUncaughtError(details.exception, details.stack);
+    };
   }
 
   static Future<Null> uploadException({String message, String detail}) async {
@@ -133,5 +165,9 @@ class FlutterPgyer {
     map.putIfAbsent("crash_message", () => message);
     map.putIfAbsent("crash_detail", () => detail);
     await _channel.invokeMethod('reportException', map);
+  }
+
+  static void dispose() {
+    _onCheckUpgrade.close();
   }
 }

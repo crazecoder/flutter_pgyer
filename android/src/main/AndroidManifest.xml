@@ -15,12 +15,6 @@
     <!-- Android8.0 以后，如果要安装 apk 需要额外添加权限：-->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <application>
-<!--        <meta-data-->
-<!--                android:name="PGYER_API_KEY"-->
-<!--                android:value="63e7826867771b618a84506bc9eefb2e"></meta-data>-->
-<!--        <meta-data-->
-<!--                android:name="PGYER_FRONTJS_KEY"-->
-<!--                android:value="44f5a0de2ec979b186c13723e1c3eb6d"></meta-data>-->
         <!--添加新版本检测-->
         <meta-data
                 android:name="PGYER_FEATURE_CHECK_UNPDATE"

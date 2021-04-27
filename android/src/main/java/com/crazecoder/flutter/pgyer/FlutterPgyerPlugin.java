@@ -8,13 +8,19 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.PermissionChecker;
 
+import com.crazecoder.flutter.pgyer.bean.CheckEnum;
 import com.crazecoder.flutter.pgyer.bean.InitResultInfo;
 import com.crazecoder.flutter.pgyer.utils.JsonUtil;
 import com.crazecoder.flutter.pgyer.utils.MapUtil;
 import com.pgyer.pgyersdk.PgyerSDKManager;
+import com.pgyer.pgyersdk.callback.CheckoutCallBack;
+import com.pgyer.pgyersdk.callback.CheckoutVersionCallBack;
+import com.pgyer.pgyersdk.model.CheckSoftModel;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -124,8 +130,55 @@ public class FlutterPgyerPlugin implements FlutterPlugin, MethodCallHandler, Act
             }
             PgyerSDKManager.reportException(new Exception(throwable));
             result.success(null);
-        } else if (call.method.equals("checkUpdate")) {
-            PgyerSDKManager.checkSoftwareUpdate(activity);
+        } else if (call.method.equals("checkSoftwareUpdate")) {
+            boolean justNotify = true;
+            if (call.hasArgument("justNotify")) {
+                justNotify = call.argument("justNotify");
+            }
+            if (justNotify) {
+                PgyerSDKManager.checkSoftwareUpdate(activity);
+            }
+            PgyerSDKManager.checkSoftwareUpdate(activity, new CheckoutVersionCallBack() {
+                @Override
+                public void onSuccess(CheckSoftModel checkSoftModel) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("model", JsonUtil.toJson(MapUtil.deepToMap(checkSoftModel)));
+                    data.put("enum", CheckEnum.SUCCESS.ordinal());
+                    channel.invokeMethod("onCheckUpgrade", data);
+                }
+
+                @Override
+                public void onFail(String s) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("enum", CheckEnum.FAIL.ordinal());
+                    channel.invokeMethod("onCheckUpgrade", data);
+                }
+            });
+            result.success(null);
+        } else if (call.method.equals("checkVersionUpdate")) {
+            PgyerSDKManager.checkVersionUpdate(activity, new CheckoutCallBack() {
+                @Override
+                public void onNewVersionExist(CheckSoftModel checkSoftModel) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("model", JsonUtil.toJson(MapUtil.deepToMap(checkSoftModel)));
+                    data.put("enum", CheckEnum.SUCCESS.ordinal());
+                    channel.invokeMethod("onCheckUpgrade", data);
+                }
+
+                @Override
+                public void onNonentityVersionExist(String s) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("enum", CheckEnum.NO_VERSION.ordinal());
+                    channel.invokeMethod("onCheckUpgrade", data);
+                }
+
+                @Override
+                public void onFail(String s) {
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("enum", CheckEnum.FAIL.ordinal());
+                    channel.invokeMethod("onCheckUpgrade", data);
+                }
+            });
             result.success(null);
         } else {
             result.notImplemented();
@@ -151,8 +204,7 @@ public class FlutterPgyerPlugin implements FlutterPlugin, MethodCallHandler, Act
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        channel.setMethodCallHandler(null);
-        flutterPluginBinding = null;
+
     }
 
     @Override
@@ -174,6 +226,7 @@ public class FlutterPgyerPlugin implements FlutterPlugin, MethodCallHandler, Act
 
     @Override
     public void onDetachedFromActivity() {
-
+        channel.setMethodCallHandler(null);
+        flutterPluginBinding = null;
     }
 }

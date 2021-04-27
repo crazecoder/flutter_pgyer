@@ -2,9 +2,10 @@
 #import <PgySDK/PgyManager.h>
 #import <PgyUpdate/PgyUpdateManager.h>
 
+FlutterMethodChannel* channel;
 @implementation FlutterPgyerPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-  FlutterMethodChannel* channel = [FlutterMethodChannel
+    channel = [FlutterMethodChannel
       methodChannelWithName:@"crazecoder/flutter_pgyer"
             binaryMessenger:[registrar messenger]];
   FlutterPgyerPlugin* instance = [[FlutterPgyerPlugin alloc] init];
@@ -67,14 +68,24 @@
   } else if ([@"showFeedbackView" isEqualToString:call.method]) {
      [[PgyManager sharedPgyManager] showFeedbackView];
      result(nil);
-  } else if ([@"checkUpdate" isEqualToString:call.method]) {
-     [[PgyUpdateManager sharedPgyManager] checkUpdate];
-//     [[PgyUpdateManager sharedPgyManager] checkUpdateWithDelegete:self selector:@selector(updateMethod:)];
+  } else if ([@"checkSoftwareUpdate" isEqualToString:call.method]) {
+      BOOL justNotify = [call.arguments[@"justNotify"] boolValue];
+      if(justNotify){
+          [[PgyUpdateManager sharedPgyManager] checkUpdate];
+      }else{
+          [[PgyUpdateManager sharedPgyManager] checkUpdateWithDelegete:self selector:@selector(checkFinish:)];
+      }
+     
      result(nil);
   } else {
      result(FlutterMethodNotImplemented);
   }
 }
+
+-(void)checkFinish:(NSNotification *)note{
+    [channel invokeMethod:@"onCheckUpgrade" arguments:note];
+}
+
 - (BOOL) isBlankString:(NSString *)string {
     if (string == nil || string == NULL) {
         return YES;
