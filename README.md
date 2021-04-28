@@ -22,19 +22,23 @@ void main() => FlutterPgyer.reportException(()=>runApp(MyApp()));
 
 //初始化
 FlutterPgyer.init(
-        iOSAppId: "appid",
-        androidAppId: "appid",
+        iOSAppKey: "your ios appkey",
+        androidApiKey: "your android apikey",
+        frontJSToken: "your frontjs token",
       );
 
-//用户反馈附带参数
+//用户反馈附带参数,iOS专用
 FlutterPgyer.setEnableFeedback(param: map);
 
-//检查更新，android用户获取更新信息，iOS直接弹窗
-//可选参数
-//bool autoDownload = false, //android专用，自动下载安装，没有交互界面
-FlutterPgyer.checkUpdate();
+//检查更新，justNotify默认true
+FlutterPgyer.checkSoftwareUpdate(justNotify: false);
+//检查更新回调，justNotify为false时回调
+FlutterPgyer.onCheckUpgrade.listen((result){});
+//手动上报异常
+FlutterPgyer.uploadException({String message, String detail});
 ```
-###Android 
+
+### Android 
 在项目manifest里添加（如果对统计没有要求，可不配置，区别在于上传apk到蒲公英时，能不能检测到集成，无法检测到就不会有统计）
 ```
 <meta-data
@@ -47,17 +51,6 @@ FlutterPgyer.checkUpdate();
 3、已知问题
 ----
 1）iOS异常上报debug不可用，打包ipa没有测试，如有问题请issue
-
-4、控制台预览
-----
-#### 统计
-![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/1.png)
-![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/5.png)
-#### android异常上报
-![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/2.png)
-![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/3.png)
-#### iOS反馈
-![](https://github.com/crazecoder/flutter_pgyer/blob/master/screenshot/6.png)
 
 
 
