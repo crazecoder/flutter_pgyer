@@ -1,6 +1,6 @@
 class InitResultInfo {
-  String message = "";
-  bool isSuccess = false;
+  String? message = "";
+  bool? isSuccess = false;
 
   InitResultInfo();
 

@@ -1,19 +1,19 @@
 import 'package:flutter_pgyer/src/bean/check_model_base.dart';
 
-class IOSCheckModel extends CheckModelBase{
-   String build;
-   String appUrl;
-   String lastBuild;
-   String forceUpdateVersion;
-   bool needForceUpdate;
-   bool haveNewVersion;
-   bool updateDeny;
-   String version;
-   String forceUpdateVersionNo;
-   String releaseNote;
-   String downloadURL;
+class IOSCheckModel extends CheckModelBase {
+  String? build;
+  String? appUrl;
+  String? lastBuild;
+  String? forceUpdateVersion;
+  bool? needForceUpdate;
+  bool? haveNewVersion;
+  bool? updateDeny;
+  String? version;
+  String? forceUpdateVersionNo;
+  String? releaseNote;
+  String? downloadURL;
 
-  IOSCheckModel.fromJson(json){
+  IOSCheckModel.fromJson(json) {
     build = json['build'];
     forceUpdateVersion = json['forceUpdateVersion'];
     forceUpdateVersionNo = json['forceUpdateVersionNo'];

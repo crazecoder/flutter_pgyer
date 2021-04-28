@@ -17,13 +17,18 @@ class FlutterPgyer {
       const MethodChannel('crazecoder/flutter_pgyer');
   static final _onCheckUpgrade = StreamController<CheckResult>.broadcast();
 
+  FlutterPgyer._();
+
   static Future<Null> _handleMessages(MethodCall call) async {
     switch (call.method) {
       case 'onCheckUpgrade':
         CheckResult _result = CheckResult(
-          model: Platform.isIOS
-              ? IOSCheckModel.fromJson(call.arguments)
-              : CheckSoftModel.fromJson(call.arguments["model"]),
+          model: call.arguments == null ||
+                  (Platform.isAndroid && call.arguments["model"] == null)
+              ? null
+              : Platform.isIOS
+                  ? IOSCheckModel.fromJson(call.arguments)
+                  : CheckSoftModel.fromJson(call.arguments["model"]),
           checkEnum: Platform.isIOS
               ? call.arguments == null
                   ? CheckEnum.NO_VERSION
@@ -38,16 +43,16 @@ class FlutterPgyer {
   static Stream<CheckResult> get onCheckUpgrade => _onCheckUpgrade.stream;
 
   static void init({
-    FlutterPgyerInitCallBack callBack,
-    String androidApiKey,
-    String frontJSToken,
-    String iOSAppKey,
+    FlutterPgyerInitCallBack? callBack,
+    String? androidApiKey,
+    String? frontJSToken,
+    String? iOSAppKey,
   }) {
     assert(
         (Platform.isAndroid && androidApiKey != null && frontJSToken != null) ||
             (Platform.isIOS && iOSAppKey != null));
     _channel.setMethodCallHandler(_handleMessages);
-    Map<String, Object> map = {
+    Map<String, Object?> map = {
       "apiKey": androidApiKey,
       "frontJSToken": frontJSToken,
       "appId": iOSAppKey,
@@ -61,27 +66,28 @@ class FlutterPgyer {
     }).sendPort);
     runZonedGuarded(
       () async {
-        final String result = await _channel.invokeMethod('initSdk', map);
+        final String result =
+            await (_channel.invokeMethod('initSdk', map) as FutureOr<String>);
         Map resultMap = json.decode(result);
-        resultBean = InitResultInfo.fromJson(resultMap);
-        callBack(resultBean);
+        resultBean = InitResultInfo.fromJson(resultMap as Map<String, dynamic>);
+        callBack!(resultBean);
       },
       (error, stackTrace) {
         resultBean = InitResultInfo();
-        callBack(resultBean);
+        callBack!(resultBean);
       },
     );
     FlutterError.onError = (details) {
-      Zone.current.handleUncaughtError(details.exception, details.stack);
+      Zone.current.handleUncaughtError(details.exception, details.stack!);
     };
   }
 
   ///用户反馈 iOS专用
   static Future<Null> setEnableFeedback({
     bool enable = true,
-    String colorHex, //反馈界面主题颜色，16进制颜色字符串，如#FFFFFF
+    String? colorHex, //反馈界面主题颜色，16进制颜色字符串，如#FFFFFF
     bool isDialog = true, // android专用，设置用户反馈为弹窗，false 为activity
-    Map<String, String> param, // android专用，自定义的反馈数据
+    Map<String, String>? param, // android专用，自定义的反馈数据
     bool isThreeFingersPan =
         false, // ios，设置用户反馈界面激活方式为三指拖动 android，设置true时，不开启摇一摇，需要手动show
     double shakingThreshold = 2.3, //ios专用，自定义摇一摇灵敏度，默认为2.3，数值越小灵敏度越高
@@ -89,7 +95,7 @@ class FlutterPgyer {
     if (Platform.isAndroid) {
       return;
     }
-    Map<String, Object> map = {
+    Map<String, Object?> map = {
       "enable": enable,
       "colorHex": colorHex,
       "isDialog": isDialog,
@@ -122,8 +128,8 @@ class FlutterPgyer {
   ///调试模式下iOS会因为当前为调试模式，所以异常信息将不会被上报至蒲公英。
   static void reportException<T>(
     T callback(), {
-    FlutterExceptionHandler handler, //异常捕捉，用于自定义打印异常
-    String filterRegExp, //异常上报过滤正则，针对message
+    FlutterExceptionHandler? handler, //异常捕捉，用于自定义打印异常
+    String? filterRegExp, //异常上报过滤正则，针对message
   }) {
     bool useLog = false;
     assert(useLog = true);
@@ -157,11 +163,11 @@ class FlutterPgyer {
       uploadException(message: errorStr, detail: stackTrace.toString());
     });
     FlutterError.onError = (FlutterErrorDetails details) async {
-      Zone.current.handleUncaughtError(details.exception, details.stack);
+      Zone.current.handleUncaughtError(details.exception, details.stack!);
     };
   }
 
-  static Future<Null> uploadException({String message, String detail}) async {
+  static Future<Null> uploadException({String? message, String? detail}) async {
     assert(message != null && detail != null);
     var map = {};
     map.putIfAbsent("crash_message", () => message);

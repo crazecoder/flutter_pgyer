@@ -1,11 +1,11 @@
 name: flutter_pgyer
 description: pgyer.com for flutter
-version: 2.0.1
+version: 2.1.0+1
 author: crazecoder <21527312@qq.com>
 homepage: https://github.com/crazecoder/flutter_pgyer
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: '>=2.12.0 <3.0.0'
   flutter: ">=1.12.0"
 
 dependencies:

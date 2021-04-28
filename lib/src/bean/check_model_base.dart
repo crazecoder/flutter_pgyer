@@ -1,3 +1,1 @@
-class CheckModelBase{
-
-}
+class CheckModelBase {}
