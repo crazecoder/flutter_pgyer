@@ -16,7 +16,6 @@ FlutterMethodChannel* channel;
   if ([@"initSdk" isEqualToString:call.method]) {
       NSString *appId = call.arguments[@"appId"];
       BOOL b = [self isBlankString:appId];
-      NSString * json;
       if(!b){
           //启动基本SDK
           [[PgyManager sharedPgyManager] startManagerWithAppId:appId];
@@ -24,13 +23,14 @@ FlutterMethodChannel* channel;
           [[PgyUpdateManager sharedPgyManager] startManagerWithAppId:appId];
           NSDictionary * dict = @{@"message":@"初始化成功", @"isSuccess":@YES};
           NSData * jsonData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:nil];
-          json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+          NSString * json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+          result(json);
       }else{
           NSDictionary * dict = @{@"message":@"初始化失败", @"isSuccess":@NO};
           NSData * jsonData = [NSJSONSerialization dataWithJSONObject:dict options:NSJSONWritingPrettyPrinted error:nil];
-          json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+          NSString * json = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+          result(json);
       }
-     result(json);
   } else if ([@"reportException" isEqualToString:call.method]) {
      NSString *crash_detail = call.arguments[@"crash_detail"];
      NSString *crash_message = call.arguments[@"crash_message"];
