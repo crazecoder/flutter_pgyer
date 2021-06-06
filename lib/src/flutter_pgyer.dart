@@ -67,7 +67,7 @@ class FlutterPgyer {
     runZonedGuarded(
       () async {
         final String result =
-            await (_channel.invokeMethod('initSdk', map) as FutureOr<String>);
+            await (_channel.invokeMethod('initSdk', map) as FutureOr<dynamic>);
         Map resultMap = json.decode(result);
         resultBean = InitResultInfo.fromJson(resultMap as Map<String, dynamic>);
         callBack!(resultBean);
