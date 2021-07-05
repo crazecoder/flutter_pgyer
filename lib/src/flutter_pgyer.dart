@@ -5,6 +5,7 @@ import 'dart:isolate';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_pgyer/src/bean/check_result.dart';
 import 'package:flutter_pgyer/src/bean/check_soft_model.dart';
 import 'package:flutter_pgyer/src/bean/ios_check_model.dart';
@@ -78,6 +79,10 @@ class FlutterPgyer {
       },
     );
     FlutterError.onError = (details) {
+      if (details.stack == null) {
+        FlutterError.presentError(details);
+        return;
+      }
       Zone.current.handleUncaughtError(details.exception, details.stack!);
     };
   }
