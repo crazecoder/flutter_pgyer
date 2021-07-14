@@ -15,14 +15,14 @@
     <!-- Android8.0 以后，如果要安装 apk 需要额外添加权限：-->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <application>
-        <!--添加新版本检测-->
-        <meta-data
-                android:name="PGYER_FEATURE_CHECK_UNPDATE"
-                android:value="true"></meta-data>
+<!--        &lt;!&ndash;添加新版本检测&ndash;&gt;-->
+<!--        <meta-data-->
+<!--                android:name="PGYER_FEATURE_CHECK_UNPDATE"-->
+<!--                android:value="true"></meta-data>-->
 
-        <!-- 是否支持热更新 -->
-        <meta-data
-                android:name="PGYER_HOT_UPDATE"
-                android:value="true" />
+<!--        &lt;!&ndash; 设置fps阈值 &ndash;&gt;-->
+<!--        <meta-data-->
+<!--                android:name="PGYER_FPS_THRESHOLD"-->
+<!--                android:value="10"/>-->
     </application>
 </manifest>

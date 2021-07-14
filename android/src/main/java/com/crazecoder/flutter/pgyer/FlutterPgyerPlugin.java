@@ -137,23 +137,25 @@ public class FlutterPgyerPlugin implements FlutterPlugin, MethodCallHandler, Act
             }
             if (justNotify) {
                 PgyerSDKManager.checkSoftwareUpdate(activity);
-            }
-            PgyerSDKManager.checkSoftwareUpdate(activity, new CheckoutVersionCallBack() {
-                @Override
-                public void onSuccess(CheckSoftModel checkSoftModel) {
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("model", JsonUtil.toJson(MapUtil.deepToMap(checkSoftModel)));
-                    data.put("enum", CheckEnum.SUCCESS.ordinal());
-                    channel.invokeMethod("onCheckUpgrade", data);
-                }
+            }else{
+                PgyerSDKManager.checkSoftwareUpdate(activity, new CheckoutVersionCallBack() {
+                    @Override
+                    public void onSuccess(CheckSoftModel checkSoftModel) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("model", JsonUtil.toJson(MapUtil.deepToMap(checkSoftModel)));
+                        data.put("enum", CheckEnum.SUCCESS.ordinal());
+                        channel.invokeMethod("onCheckUpgrade", data);
+                    }
 
-                @Override
-                public void onFail(String s) {
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("enum", CheckEnum.FAIL.ordinal());
-                    channel.invokeMethod("onCheckUpgrade", data);
-                }
-            });
+                    @Override
+                    public void onFail(String s) {
+                        Map<String, Object> data = new HashMap<>();
+                        data.put("enum", CheckEnum.FAIL.ordinal());
+                        channel.invokeMethod("onCheckUpgrade", data);
+                    }
+                });
+            }
+
             result.success(null);
         } else if (call.method.equals("checkVersionUpdate")) {
             PgyerSDKManager.checkVersionUpdate(activity, new CheckoutCallBack() {
