@@ -1,3 +1,6 @@
+# 考虑到蒲公英异常上报及统计需要付费，白嫖党可以使用[pgyer_updater](https://github.com/crazecoder/pgyer_updater)实现应用更新和[flutter_bugly](https://github.com/crazecoder/flutter_bugly)实现异常上报及统计来配合使用
+
+
 # flutter_pgyer
 [![pub package](https://img.shields.io/pub/v/flutter_pgyer.svg)](https://pub.dartlang.org/packages/flutter_pgyer)
 
